@@ -1,0 +1,5 @@
+/* patients.css — my_patients page */
+.patients-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:1.25rem; }
+.patient-card { background:var(--white); border-radius:14px; box-shadow:0 1px 4px rgba(0,0,0,.06); padding:1.5rem; }
+.patient-avatar { width:46px; height:46px; border-radius:50%; background:var(--teal); color:#fff; font-size:1.1rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.appt-row { display:flex; justify-content:space-between; align-items:center; font-size:.8rem; padding:.3rem 0; border-bottom:1px solid var(--border); }

@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+{% block title %}
+  {% if user.role == 'admin' %}Dashboard{% elif user.role == 'doctor' %}My Schedule{% else %}My Appointments{% endif %} — MediBook
+{% endblock %}
+{% block content %}
+
+{# ══════════ PATIENT ══════════ #}
+{% if user.role == 'patient' %}
+
+<div class="page-header">
+  <h1 class="page-title"><i class="fa fa-calendar-days"></i> My Appointments</h1>
+  <a href="{{ url_for('book_appointment') }}" class="btn btn-primary">
+    <i class="fa fa-calendar-plus"></i> Book New Appointment
+  </a>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon si-teal"><i class="fa fa-calendar"></i></div>
+    <div class="stat-val">{{ appointments|length }}</div>
+    <div class="stat-lbl">Total</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon si-warn"><i class="fa fa-clock"></i></div>
+    <div class="stat-val">{{ appointments|selectattr('status','eq','pending')|list|length }}</div>
+    <div class="stat-lbl">Pending</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon si-ok"><i class="fa fa-circle-check"></i></div>
+    <div class="stat-val">{{ appointments|selectattr('status','eq','confirmed')|list|length }}</div>
+    <div class="stat-lbl">Confirmed</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title"><i class="fa fa-list"></i> Appointments</div>
+  {% if appointments %}
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>#</th><th>Doctor</th><th>Department</th><th>Date</th><th>Time</th><th>Reason</th><th>Status</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for appt in appointments %}
+        <tr>
+          <td class="td-id">{{ appt.id }}</td>
+          <td class="td-name">{{ appt.doctor.name }}</td>
+          <td class="td-gray">{{ appt.department.name }}</td>
+          <td>{{ appt.date }}</td>
+          <td>{{ appt.time }}</td>
+          <td class="td-trunc">{{ appt.reason or '—' }}</td>
+          <td><span class="badge badge-{{ appt.status }}">{{ appt.status }}</span></td>
+          <td>
+            <div class="td-actions">
+              <a href="{{ url_for('messages') }}?with={{ appt.doctor_id }}" class="btn btn-secondary btn-sm"><i class="fa fa-comment"></i> Message</a>
+              {% if appt.status != 'cancelled' %}
+              <form method="POST" action="{{ url_for('cancel_appointment', appt_id=appt.id) }}" onsubmit="return confirm('Cancel this appointment?')">
+                <button class="btn btn-danger btn-sm"><i class="fa fa-xmark"></i> Cancel</button>
+              </form>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <i class="fa fa-calendar-xmark"></i>
+    No appointments yet.
+    <br><a href="{{ url_for('book_appointment') }}" class="btn btn-primary" class="mt-1">Book your first appointment</a>
+  </div>
+  {% endif %}
+</div>
+
+{# ══════════ DOCTOR ══════════ #}
+{% elif user.role == 'doctor' %}
+
+<div class="page-header">
+  <h1 class="page-title"><i class="fa fa-calendar-check"></i> My Schedule</h1>
+  <a href="{{ url_for('my_patients') }}" class="btn btn-primary"><i class="fa fa-users"></i> My Patients</a>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon si-teal"><i class="fa fa-calendar-day"></i></div>
+    <div class="stat-val">{{ today_count }}</div>
+    <div class="stat-lbl">Today</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon si-warn"><i class="fa fa-clock"></i></div>
+    <div class="stat-val">{{ appointments|selectattr('status','eq','pending')|list|length }}</div>
+    <div class="stat-lbl">Pending</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon si-info"><i class="fa fa-users"></i></div>
+    <div class="stat-val">{{ total_patients }}</div>
+    <div class="stat-lbl">Total Patients</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title"><i class="fa fa-calendar-days"></i> Schedule</div>
+  {% if appointments %}
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>#</th><th>Patient</th><th>Department</th><th>Date</th><th>Time</th><th>Reason</th><th>Status</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for appt in appointments %}
+        <tr>
+          <td class="td-id">{{ appt.id }}</td>
+          <td>
+            <div class="td-name">{{ appt.patient.name }}</div>
+            <div class="td-sub">{{ appt.patient.phone or '' }}</div>
+          </td>
+          <td class="td-gray">{{ appt.department.name }}</td>
+          <td>{{ appt.date }}</td>
+          <td>{{ appt.time }}</td>
+          <td class="td-trunc">{{ appt.reason or '—' }}</td>
+          <td><span class="badge badge-{{ appt.status }}">{{ appt.status }}</span></td>
+          <td>
+            <div class="td-actions">
+              {% if appt.status == 'pending' %}
+              <form method="POST" action="{{ url_for('update_appointment', appt_id=appt.id) }}">
+                <input type="hidden" name="status" value="confirmed">
+                <input type="hidden" name="notes" value="">
+                <button class="btn btn-primary btn-sm"><i class="fa fa-check"></i> Confirm</button>
+              </form>
+              {% else %}
+              <a href="{{ url_for('messages') }}?with={{ appt.patient_id }}" class="btn btn-secondary btn-sm"><i class="fa fa-comment"></i> Message</a>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <i class="fa fa-calendar-xmark"></i>
+    No appointments in your schedule yet.
+  </div>
+  {% endif %}
+</div>
+
+{# ══════════ ADMIN ══════════ #}
+{% else %}
+
+<div class="page-header">
+  <h1 class="page-title">
+    <i class="fa fa-shield-halved"></i> Admin Dashboard
+    <span class="role-badge">admin</span>
+  </h1>
+  <a href="{{ url_for('admin_add_doctor') }}" class="btn btn-primary"><i class="fa fa-user-doctor"></i> Add Doctor</a>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon si-info"><i class="fa fa-users"></i></div>
+    <div class="stat-val">{{ total_patients }}</div>
+    <div class="stat-lbl">Patients</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon si-teal"><i class="fa fa-user-doctor"></i></div>
+    <div class="stat-val">{{ total_doctors }}</div>
+    <div class="stat-lbl">Doctors</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon si-warn"><i class="fa fa-calendar-day"></i></div>
+    <div class="stat-val">{{ today_count }}</div>
+    <div class="stat-lbl">Today's Appts</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon si-ok"><i class="fa fa-calendar-check"></i></div>
+    <div class="stat-val">{{ total_appointments }}</div>
+    <div class="stat-lbl">Total Appts</div>
+  </div>
+</div>
+
+<div class="dash-two-col">
+  <div class="card">
+    <div class="card-title"><i class="fa fa-user-plus"></i> Recent Registrations</div>
+    <table>
+      <thead><tr><th>Name</th><th>Role</th><th>Joined</th></tr></thead>
+      <tbody>
+        {% for u in recent_users %}
+        <tr>
+          <td>
+            <div class="td-name">{{ u.name }}</div>
+            <div class="td-sub">{{ u.email }}</div>
+          </td>
+          <td><span class="badge-role">{{ u.role }}</span></td>
+          <td class="td-gray">{{ u.created_at.strftime('%d %b') }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <div class="card-footer-link">
+      <a href="{{ url_for('admin_users') }}" class="btn btn-secondary btn-sm"><i class="fa fa-arrow-right"></i> Manage Users</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><i class="fa fa-calendar-days"></i> Recent Appointments</div>
+    {% if appointments %}
+    <table>
+      <thead><tr><th>Patient</th><th>Doctor</th><th>Date</th><th>Status</th></tr></thead>
+      <tbody>
+        {% for appt in appointments[:8] %}
+        <tr>
+          <td class="tbl-cell-name-sm">{{ appt.patient.name }}</td>
+          <td class="td-gray">{{ appt.doctor.name }}</td>
+          <td class="td-gray">{{ appt.date }}</td>
+          <td><span class="badge badge-{{ appt.status }}">{{ appt.status }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">No appointments yet.</div>
+    {% endif %}
+    <div class="card-footer-link">
+      <a href="{{ url_for('admin_appointments') }}" class="btn btn-secondary btn-sm"><i class="fa fa-arrow-right"></i> All Appointments</a>
+    </div>
+  </div>
+</div>
+
+{% endif %}
+{% endblock %}

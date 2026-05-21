@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}My Patients — MediBook{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <h1 class="page-title">
+    <i class="fa fa-users"></i> My Patients
+    <span class="page-title-sub">({{ patients|length }})</span>
+  </h1>
+</div>
+
+{% if patients %}
+<div class="patients-grid">
+  {% for p in patients %}
+  {% set pappts = appointments|selectattr('patient_id','eq',p.id)|list %}
+  <div class="patient-card">
+    <div class="patient-header">
+      <div class="patient-avatar">{{ p.name[0]|upper }}</div>
+      <div>
+        <div class="patient-name">{{ p.name }}</div>
+        <div class="patient-detail"><i class="fa fa-envelope"></i> {{ p.email }}</div>
+        {% if p.phone %}<div class="patient-detail"><i class="fa fa-phone"></i> {{ p.phone }}</div>{% endif %}
+      </div>
+    </div>
+    <div class="appt-history-title">Appointment History</div>
+    {% if pappts %}
+      {% for appt in pappts[:3] %}
+      <div class="appt-row">
+        <span class="appt-row-date"><i class="fa fa-calendar"></i> {{ appt.date }} {{ appt.time }}</span>
+        <span class="badge badge-{{ appt.status }}">{{ appt.status }}</span>
+      </div>
+      {% endfor %}
+      {% if pappts|length > 3 %}
+      <div class="appt-more">+{{ pappts|length - 3 }} more</div>
+      {% endif %}
+    {% else %}
+      <div class="patient-detail">No appointments yet.</div>
+    {% endif %}
+    <div class="patient-footer">
+      <a href="{{ url_for('messages') }}?with={{ p.id }}" class="btn btn-primary btn-sm btn-full">
+        <i class="fa fa-comment"></i> Send Message
+      </a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card">
+  <div class="empty-state">
+    <i class="fa fa-users"></i>
+    No patients assigned yet.
+  </div>
+</div>
+{% endif %}
+{% endblock %}

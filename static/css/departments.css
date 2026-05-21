@@ -1,0 +1,8 @@
+/* departments.css & doctors.css */
+.dept-grid-page { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:1.25rem; }
+.dept-card-page { background:var(--white); border:1px solid var(--border); border-radius:14px; padding:1.5rem; border-top:3px solid var(--teal); transition:transform .2s; }
+.dept-card-page:hover { transform:translateY(-3px); }
+.dept-card-page i { font-size:1.6rem; color:var(--teal); margin-bottom:.75rem; display:block; }
+.doc-grid-page { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:1.25rem; }
+.doc-card-page { background:var(--white); border:1px solid var(--border); border-radius:14px; padding:1.5rem; text-align:center; }
+.doc-avatar-lg { width:64px; height:64px; border-radius:50%; background:linear-gradient(135deg,var(--teal),var(--navy)); color:#fff; font-size:1.5rem; display:flex; align-items:center; justify-content:center; margin:0 auto .75rem; }

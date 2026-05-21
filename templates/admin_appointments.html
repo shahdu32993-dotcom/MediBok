@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}All Appointments — MediBook{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <h1 class="page-title">
+    <i class="fa fa-calendar-days"></i> All Appointments
+    <span class="page-title-sub">({{ appointments|length }})</span>
+  </h1>
+</div>
+
+<div class="filter-bar">
+  <a href="{{ url_for('admin_appointments') }}"                    class="btn {% if not selected_status %}btn-primary{% else %}btn-secondary{% endif %} btn-sm">All</a>
+  <a href="{{ url_for('admin_appointments', status='pending') }}"  class="btn {% if selected_status=='pending'   %}btn-primary{% else %}btn-secondary{% endif %} btn-sm">Pending</a>
+  <a href="{{ url_for('admin_appointments', status='confirmed') }}" class="btn {% if selected_status=='confirmed' %}btn-primary{% else %}btn-secondary{% endif %} btn-sm">Confirmed</a>
+  <a href="{{ url_for('admin_appointments', status='cancelled') }}" class="btn {% if selected_status=='cancelled' %}btn-primary{% else %}btn-secondary{% endif %} btn-sm">Cancelled</a>
+</div>
+
+<div class="card">
+  {% if appointments %}
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>#</th><th>Patient</th><th>Doctor</th><th>Department</th><th>Date</th><th>Time</th><th>Status</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for appt in appointments %}
+        <tr>
+          <td class="td-id">{{ appt.id }}</td>
+          <td>
+            <div class="td-name">{{ appt.patient.name }}</div>
+            <div class="td-sub">{{ appt.patient.phone or '' }}</div>
+          </td>
+          <td>
+            <div class="td-name">{{ appt.doctor.name }}</div>
+            {% if appt.doctor.specialty %}<div class="td-teal">{{ appt.doctor.specialty }}</div>{% endif %}
+          </td>
+          <td class="td-gray">{{ appt.department.name }}</td>
+          <td>{{ appt.date }}</td>
+          <td>{{ appt.time }}</td>
+          <td><span class="badge badge-{{ appt.status }}">{{ appt.status }}</span></td>
+          <td>
+            <div class="td-actions">
+              {% if appt.status == 'pending' %}
+              <form method="POST" action="{{ url_for('update_appointment', appt_id=appt.id) }}">
+                <input type="hidden" name="status" value="confirmed">
+                <input type="hidden" name="notes" value="">
+                <button class="btn btn-primary btn-sm"><i class="fa fa-check"></i> Confirm</button>
+              </form>
+              {% endif %}
+              {% if appt.status != 'cancelled' %}
+              <form method="POST" action="{{ url_for('cancel_appointment', appt_id=appt.id) }}" onsubmit="return confirm('Cancel?')">
+                <button class="btn btn-danger btn-sm"><i class="fa fa-xmark"></i> Cancel</button>
+              </form>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <i class="fa fa-calendar-xmark"></i>
+    No appointments found.
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

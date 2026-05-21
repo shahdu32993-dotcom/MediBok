@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MediBook — Description Document</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--navy:#0a1628;--teal:#0d9488;--teal2:#14b8a6;--cream:#f8f5f0;--white:#fff;--gray:#64748b;--border:#e2e8f0;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--navy);padding:2rem;}
+    h1{font-family:'DM Serif Display',serif;font-size:2.2rem;color:var(--navy);margin-bottom:.3rem;}
+    h2{font-family:'DM Serif Display',serif;font-size:1.5rem;color:var(--navy);margin:2.5rem 0 1rem;display:flex;align-items:center;gap:.5rem;}
+    h2::before{content:'';display:inline-block;width:4px;height:1.4rem;background:var(--teal);border-radius:2px;}
+    h3{font-size:1rem;font-weight:700;color:var(--teal);margin:1.2rem 0 .5rem;}
+    p{color:var(--gray);line-height:1.7;margin-bottom:.75rem;}
+    .subtitle{color:var(--gray);font-size:1rem;margin-bottom:2rem;}
+    .card{background:var(--white);border-radius:16px;box-shadow:0 1px 4px rgba(0,0,0,.06);padding:2rem;margin-bottom:1.5rem;}
+
+    /* ── ERD ── */
+    .erd-wrap{overflow-x:auto;}
+    .erd{display:flex;gap:2rem;align-items:flex-start;min-width:700px;padding:.5rem;}
+    .table-box{border:2px solid var(--border);border-radius:12px;overflow:hidden;min-width:180px;flex-shrink:0;}
+    .table-head{background:var(--navy);color:#fff;padding:.6rem 1rem;font-weight:700;font-size:.9rem;text-align:center;}
+    .table-head.teal{background:var(--teal);}
+    .table-row{display:flex;justify-content:space-between;align-items:center;padding:.4rem 1rem;border-bottom:1px solid var(--border);font-size:.83rem;gap:1rem;}
+    .table-row:last-child{border-bottom:none;}
+    .col-name{font-weight:600;color:var(--navy);}
+    .col-type{color:var(--gray);font-size:.75rem;}
+    .pk{color:var(--teal);font-weight:700;}
+    .fk{color:#f59e0b;font-weight:700;}
+
+    .erd-arrows{display:flex;flex-direction:column;justify-content:center;gap:.5rem;padding-top:2rem;}
+    .arrow{display:flex;flex-direction:column;align-items:center;font-size:.72rem;color:var(--gray);gap:.2rem;}
+    .arrow-line{width:60px;height:2px;background:var(--teal);position:relative;}
+    .arrow-line::after{content:'▶';position:absolute;right:-8px;top:-7px;color:var(--teal);font-size:.8rem;}
+    .arrow-label{font-size:.68rem;color:var(--teal);font-weight:600;}
+
+    /* ── DATAFLOW ── */
+    .flow{display:flex;flex-direction:column;gap:0;}
+    .flow-step{display:flex;align-items:stretch;gap:0;}
+    .flow-node{background:var(--white);border:2px solid var(--teal);border-radius:12px;padding:.75rem 1.25rem;min-width:220px;position:relative;}
+    .flow-node.actor{background:var(--navy);border-color:var(--navy);color:#fff;border-radius:50px;}
+    .flow-node.db{background:#f0fdf4;border-color:#22c55e;}
+    .flow-node-title{font-weight:700;font-size:.9rem;}
+    .flow-node-title.white{color:#fff;}
+    .flow-node-sub{font-size:.75rem;color:var(--gray);margin-top:.2rem;}
+    .flow-node-sub.light{color:rgba(255,255,255,.7);}
+    .flow-connector{display:flex;flex-direction:column;align-items:center;padding:.15rem 1rem;}
+    .flow-v-line{width:2px;flex:1;background:var(--teal);min-height:20px;}
+    .flow-arrow-down{color:var(--teal);font-size:1rem;line-height:1;}
+    .flow-label{font-size:.7rem;color:var(--teal);font-weight:600;white-space:nowrap;padding:.1rem .4rem;background:#e6f7f6;border-radius:4px;}
+    .flow-group{display:flex;gap:1rem;align-items:flex-start;}
+    .flow-branch{display:flex;flex-direction:column;align-items:center;}
+
+    /* ── LEGEND ── */
+    .legend{display:flex;gap:1.5rem;flex-wrap:wrap;margin-top:1rem;}
+    .legend-item{display:flex;align-items:center;gap:.4rem;font-size:.8rem;color:var(--gray);}
+    .legend-dot{width:12px;height:12px;border-radius:3px;}
+
+    /* ── ROLES TABLE ── */
+    table{width:100%;border-collapse:collapse;font-size:.875rem;}
+    th{background:var(--navy);color:#fff;padding:.6rem 1rem;text-align:left;font-weight:600;}
+    td{padding:.6rem 1rem;border-bottom:1px solid var(--border);}
+    tr:last-child td{border-bottom:none;}
+    .yes{color:#16a34a;font-weight:700;}
+    .no{color:#dc2626;font-weight:700;}
+  </style>
+</head>
+<body>
+
+<h1>🏥 MediBook</h1>
+<p class="subtitle">Description Document — ERD &amp; Dataflow Diagram</p>
+
+<!-- ════════════════════════════════
+     1. APP OVERVIEW
+════════════════════════════════ -->
+<div class="card">
+  <h2>1. Application Overview</h2>
+  <p><strong>MediBook</strong> is a hospital appointment management system built with Flask and MySQL. It supports three user roles — <strong>Patient</strong>, <strong>Doctor</strong>, and <strong>Admin</strong> — each with distinct capabilities.</p>
+  <ul style="margin-left:1.5rem;color:var(--gray);line-height:2;">
+    <li>Patients can register, browse doctors and departments, book appointments, and message their doctors.</li>
+    <li>Doctors can view their schedule, confirm appointments, see their patients, and reply to messages.</li>
+    <li>Admins manage all users, appointments, and can add new doctors to the system.</li>
+  </ul>
+</div>
+
+<!-- ════════════════════════════════
+     2. ERD
+════════════════════════════════ -->
+<div class="card">
+  <h2>2. Entity Relationship Diagram (ERD)</h2>
+
+  <div class="erd-wrap">
+    <div class="erd">
+
+      <!-- DEPARTMENT -->
+      <div class="table-box">
+        <div class="table-head">department</div>
+        <div class="table-row"><span class="col-name pk">id</span><span class="col-type">INT PK</span></div>
+        <div class="table-row"><span class="col-name">name</span><span class="col-type">VARCHAR</span></div>
+        <div class="table-row"><span class="col-name">description</span><span class="col-type">TEXT</span></div>
+      </div>
+
+      <!-- ARROW dept→user -->
+      <div class="erd-arrows">
+        <div class="arrow">
+          <div class="arrow-line"></div>
+          <div class="arrow-label">1 dept → N users</div>
+        </div>
+        <div class="arrow" style="margin-top:1rem;">
+          <div class="arrow-line"></div>
+          <div class="arrow-label">1 dept → N appts</div>
+        </div>
+      </div>
+
+      <!-- USER -->
+      <div class="table-box">
+        <div class="table-head teal">user</div>
+        <div class="table-row"><span class="col-name pk">id</span><span class="col-type">INT PK</span></div>
+        <div class="table-row"><span class="col-name">name</span><span class="col-type">VARCHAR</span></div>
+        <div class="table-row"><span class="col-name">email</span><span class="col-type">VARCHAR UNIQUE</span></div>
+        <div class="table-row"><span class="col-name">password_hash</span><span class="col-type">VARCHAR</span></div>
+        <div class="table-row"><span class="col-name">role</span><span class="col-type">VARCHAR</span></div>
+        <div class="table-row"><span class="col-name">phone</span><span class="col-type">VARCHAR</span></div>
+        <div class="table-row"><span class="col-name">specialty</span><span class="col-type">VARCHAR</span></div>
+        <div class="table-row"><span class="col-name fk">department_id</span><span class="col-type">FK</span></div>
+        <div class="table-row"><span class="col-name">bio</span><span class="col-type">TEXT</span></div>
+        <div class="table-row"><span class="col-name">is_active</span><span class="col-type">BOOL</span></div>
+        <div class="table-row"><span class="col-name">created_at</span><span class="col-type">DATETIME</span></div>
+      </div>
+
+      <!-- ARROW user→appointment & user→message -->
+      <div class="erd-arrows">
+        <div class="arrow">
+          <div class="arrow-line"></div>
+          <div class="arrow-label">1 patient → N appts</div>
+        </div>
+        <div class="arrow" style="margin-top:1rem;">
+          <div class="arrow-line"></div>
+          <div class="arrow-label">1 user → N messages</div>
+        </div>
+      </div>
+
+      <!-- APPOINTMENT + MESSAGE stacked -->
+      <div style="display:flex;flex-direction:column;gap:1rem;">
+
+        <div class="table-box">
+          <div class="table-head">appointment</div>
+          <div class="table-row"><span class="col-name pk">id</span><span class="col-type">INT PK</span></div>
+          <div class="table-row"><span class="col-name fk">patient_id</span><span class="col-type">FK→user</span></div>
+          <div class="table-row"><span class="col-name fk">doctor_id</span><span class="col-type">FK→user</span></div>
+          <div class="table-row"><span class="col-name fk">department_id</span><span class="col-type">FK→dept</span></div>
+          <div class="table-row"><span class="col-name">date</span><span class="col-type">VARCHAR</span></div>
+          <div class="table-row"><span class="col-name">time</span><span class="col-type">VARCHAR</span></div>
+          <div class="table-row"><span class="col-name">reason</span><span class="col-type">TEXT</span></div>
+          <div class="table-row"><span class="col-name">status</span><span class="col-type">VARCHAR</span></div>
+          <div class="table-row"><span class="col-name">notes</span><span class="col-type">TEXT</span></div>
+          <div class="table-row"><span class="col-name">created_at</span><span class="col-type">DATETIME</span></div>
+        </div>
+
+        <div class="table-box">
+          <div class="table-head">message</div>
+          <div class="table-row"><span class="col-name pk">id</span><span class="col-type">INT PK</span></div>
+          <div class="table-row"><span class="col-name fk">sender_id</span><span class="col-type">FK→user</span></div>
+          <div class="table-row"><span class="col-name fk">receiver_id</span><span class="col-type">FK→user</span></div>
+          <div class="table-row"><span class="col-name">content</span><span class="col-type">TEXT</span></div>
+          <div class="table-row"><span class="col-name">is_read</span><span class="col-type">BOOL</span></div>
+          <div class="table-row"><span class="col-name">created_at</span><span class="col-type">DATETIME</span></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="legend" style="margin-top:1.5rem;">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div> PK = Primary Key</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div> FK = Foreign Key</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--navy)"></div> Central table (user)</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     3. DATAFLOW
+════════════════════════════════ -->
+<div class="card">
+  <h2>3. Dataflow Diagram</h2>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;flex-wrap:wrap;">
+
+    <!-- FLOW 1: Register -->
+    <div>
+      <h3>📝 Flow 1 — Register</h3>
+      <div class="flow">
+        <div class="flow-step"><div class="flow-node actor"><div class="flow-node-title white">User (Browser)</div><div class="flow-node-sub light">Fills register form</div></div></div>
+        <div class="flow-connector"><div class="flow-v-line"></div><div class="flow-label">POST /register</div><div class="flow-arrow-down">▼</div></div>
+        <div class="flow-step"><div class="flow-node"><div class="flow-node-title">Flask — register()</div><div class="flow-node-sub">Validates input, hashes password</div></div></div>
+        <div class="flow-connector"><div class="flow-v-line"></div><div class="flow-label">INSERT user</div><div class="flow-arrow-down">▼</div></div>
+        <div class="flow-step"><div class="flow-node db"><div class="flow-node-title">MySQL — user table</div><div class="flow-node-sub">New row saved (role=patient)</div></div></div>
+        <div class="flow-connector"><div class="flow-v-line"></div><div class="flow-label">redirect</div><div class="flow-arrow-down">▼</div></div>
+        <div class="flow-step"><div class="flow-node actor"><div class="flow-node-title white">Login Page</div></div></div>
+      </div>
+    </div>
+
+    <!-- FLOW 2: Login -->
+    <div>
+      <h3>🔐 Flow 2 — Login</h3>
+      <div class="flow">
+        <div class="flow-step"><div class="flow-node actor"><div class="flow-node-title white">User (Browser)</div><div class="flow-node-sub light">Enters email + password</div></div></div>
+        <div class="flow-connector"><div class="flow-v-line"></div><div class="flow-label">POST /login</div><div class="flow-arrow-down">▼</div></div>
+        <div class="flow-step"><div class="flow-node"><div class="flow-node-title">Flask — login()</div><div class="flow-node-sub">Query user by email</div></div></div>
+        <div class="flow-connector"><div class="flow-v-line"></div><div class="flow-label">SELECT user</div><div class="flow-arrow-down">▼</div></div>
+        <div class="flow-step"><div class="flow-node db"><div class="flow-node-title">MySQL — user table</div><div class="flow-node-sub">Returns user row</div></div></div>
+        <div class="flow-connector"><div class="flow-v-line"></div><div class="flow-label">check_password → session</div><div class="flow-arrow-down">▼</div></div>
+        <div class="flow-step"><div class="flow-node actor"><div class="flow-node-title white">Dashboard (role-based)</div></div></div>
+      </div>
+    </div>
+
+    <!-- FLOW 3: Book Appointment -->
+    <div>
+      <h3>📅 Flow 3 — Book Appointment</h3>
+      <div class="flow">
+        <div class="flow-step"><div class="flow-node actor"><div class="flow-node-title white">Patient</div><div class="flow-node-sub light">Selects doctor, date, time</div></div></div>
+        <div class="flow-connector"><div class="flow-v-line"></div><div class="flow-label">POST /book</div><div class="flow-arrow-down">▼</div></div>
+        <div class="flow-step"><div class="flow-node"><div class="flow-node-title">Flask — book_appointment()</div><div class="flow-node-sub">Creates Appointment object</div></div></div>
+        <div class="flow-connector"><div class="flow-v-line"></div><div class="flow-label">INSERT appointment (status=pending)</div><div class="flow-arrow-down">▼</div></div>
+        <div class="flow-step"><div class="flow-node db"><div class="flow-node-title">MySQL — appointment table</div><div class="flow-node-sub">New appointment row</div></div></div>
+        <div class="flow-connector"><div class="flow-v-line"></div><div class="flow-label">redirect</div><div class="flow-arrow-down">▼</div></div>
+        <div class="flow-step"><div class="flow-node actor"><div class="flow-node-title white">Patient Dashboard</div></div></div>
+      </div>
+    </div>
+
+    <!-- FLOW 4: Confirm Appointment -->
+    <div>
+      <h3>✅ Flow 4 — Confirm Appointment</h3>
+      <div class="flow">
+        <div class="flow-step"><div class="flow-node actor"><div class="flow-node-title white">Doctor</div><div class="flow-node-sub light">Clicks Confirm button</div></div></div>
+        <div class="flow-connector"><div class="flow-v-line"></div><div class="flow-label">POST /appointment/&lt;id&gt;/update</div><div class="flow-arrow-down">▼</div></div>
+        <div class="flow-step"><div class="flow-node"><div class="flow-node-title">Flask — update_appointment()</div><div class="flow-node-sub">Checks role = doctor/admin</div></div></div>
+        <div class="flow-connector"><div class="flow-v-line"></div><div class="flow-label">UPDATE status=confirmed</div><div class="flow-arrow-down">▼</div></div>
+        <div class="flow-step"><div class="flow-node db"><div class="flow-node-title">MySQL — appointment table</div><div class="flow-node-sub">Status updated</div></div></div>
+        <div class="flow-connector"><div class="flow-v-line"></div><div class="flow-label">redirect</div><div class="flow-arrow-down">▼</div></div>
+        <div class="flow-step"><div class="flow-node actor"><div class="flow-node-title white">Doctor Dashboard</div></div></div>
+      </div>
+    </div>
+
+    <!-- FLOW 5: Messaging -->
+    <div>
+      <h3>💬 Flow 5 — Send Message</h3>
+      <div class="flow">
+        <div class="flow-step"><div class="flow-node actor"><div class="flow-node-title white">User (Patient or Doctor)</div><div class="flow-node-sub light">Types and sends message</div></div></div>
+        <div class="flow-connector"><div class="flow-v-line"></div><div class="flow-label">POST /messages/send</div><div class="flow-arrow-down">▼</div></div>
+        <div class="flow-step"><div class="flow-node"><div class="flow-node-title">Flask — send_message()</div><div class="flow-node-sub">Creates Message object</div></div></div>
+        <div class="flow-connector"><div class="flow-v-line"></div><div class="flow-label">INSERT message</div><div class="flow-arrow-down">▼</div></div>
+        <div class="flow-step"><div class="flow-node db"><div class="flow-node-title">MySQL — message table</div><div class="flow-node-sub">Message saved (is_read=False)</div></div></div>
+        <div class="flow-connector"><div class="flow-v-line"></div><div class="flow-label">redirect to chat</div><div class="flow-arrow-down">▼</div></div>
+        <div class="flow-step"><div class="flow-node actor"><div class="flow-node-title white">Messages Page (updated)</div></div></div>
+      </div>
+    </div>
+
+    <!-- FLOW 6: Admin -->
+    <div>
+      <h3>🛡️ Flow 6 — Admin Add Doctor</h3>
+      <div class="flow">
+        <div class="flow-step"><div class="flow-node actor"><div class="flow-node-title white">Admin</div><div class="flow-node-sub light">Fills doctor info form</div></div></div>
+        <div class="flow-connector"><div class="flow-v-line"></div><div class="flow-label">POST /admin/add-doctor</div><div class="flow-arrow-down">▼</div></div>
+        <div class="flow-step"><div class="flow-node"><div class="flow-node-title">Flask — admin_add_doctor()</div><div class="flow-node-sub">role check → admin only</div></div></div>
+        <div class="flow-connector"><div class="flow-v-line"></div><div class="flow-label">INSERT user (role=doctor)</div><div class="flow-arrow-down">▼</div></div>
+        <div class="flow-step"><div class="flow-node db"><div class="flow-node-title">MySQL — user table</div><div class="flow-node-sub">New doctor row saved</div></div></div>
+        <div class="flow-connector"><div class="flow-v-line"></div><div class="flow-label">redirect</div><div class="flow-arrow-down">▼</div></div>
+        <div class="flow-step"><div class="flow-node actor"><div class="flow-node-title white">Admin Users Page</div></div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     4. ROLES SUMMARY
+════════════════════════════════ -->
+<div class="card">
+  <h2>4. Roles &amp; Permissions</h2>
+  <table>
+    <thead>
+      <tr><th>Feature</th><th>Patient</th><th>Doctor</th><th>Admin</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Register / Login</td><td class="yes">✅</td><td class="yes">✅</td><td class="yes">✅</td></tr>
+      <tr><td>View departments &amp; doctors</td><td class="yes">✅</td><td class="yes">✅</td><td class="yes">✅</td></tr>
+      <tr><td>Book appointment</td><td class="yes">✅</td><td class="no">❌</td><td class="no">❌</td></tr>
+      <tr><td>View own appointments</td><td class="yes">✅</td><td class="yes">✅</td><td class="yes">✅</td></tr>
+      <tr><td>Confirm appointments</td><td class="no">❌</td><td class="yes">✅</td><td class="yes">✅</td></tr>
+      <tr><td>Cancel appointments</td><td class="yes">✅</td><td class="no">❌</td><td class="yes">✅</td></tr>
+      <tr><td>Send / receive messages</td><td class="yes">✅</td><td class="yes">✅</td><td class="no">❌</td></tr>
+      <tr><td>View all users</td><td class="no">❌</td><td class="no">❌</td><td class="yes">✅</td></tr>
+      <tr><td>Add / disable users</td><td class="no">❌</td><td class="no">❌</td><td class="yes">✅</td></tr>
+      <tr><td>Manage all appointments</td><td class="no">❌</td><td class="no">❌</td><td class="yes">✅</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<p style="text-align:center;color:var(--gray);font-size:.85rem;margin-top:2rem;">MediBook — Hospital Appointment System &copy; 2024</p>
+
+</body>
+</html>

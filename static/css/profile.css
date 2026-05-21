@@ -1,0 +1,55 @@
+/* profile.css */
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.75rem;}
+.page-title{font-family:'DM Serif Display',serif;font-size:1.8rem;color:var(--navy);display:flex;align-items:center;gap:.6rem;}
+.page-title i{color:var(--teal);}
+
+.profile-layout{
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+/* بطاقة اليسار */
+.profile-info-card{
+  text-align: center;
+  padding: 2rem 1.5rem;
+  position: sticky;
+  top: 80px;
+}
+.profile-avatar-wrap{ margin-bottom: 1rem; }
+.profile-avatar-big{
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: var(--teal);
+  color: #fff;
+  font-size: 2rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto;
+}
+.profile-name{ font-family:'DM Serif Display',serif; font-size:1.2rem; font-weight:600; margin-bottom:.3rem; }
+.profile-email,.profile-phone{ font-size:.82rem; color:var(--gray); margin-bottom:.2rem; }
+.profile-email i,.profile-phone i{ color:var(--teal); margin-right:.3rem; }
+.profile-role-badge{
+  display: inline-block;
+  margin-top:.5rem;
+  background: var(--teal); color: #fff;
+  font-size:.72rem; font-weight:700;
+  padding:.2rem .75rem; border-radius:99px;
+  text-transform: uppercase;
+}
+.profile-divider{ border:none; border-top:1px solid var(--border); margin:1rem 0; }
+.profile-detail{ font-size:.85rem; color:var(--gray); margin-bottom:.4rem; }
+.profile-detail i{ color:var(--teal); margin-right:.4rem; }
+.profile-bio{ font-size:.82rem; color:var(--gray); line-height:1.6; font-style:italic; }
+.profile-meta{ font-size:.78rem; color:var(--gray); }
+.profile-meta i{ color:var(--teal); margin-right:.3rem; }
+
+/* فورم اليمين */
+.profile-form-wrap{ display:flex; flex-direction:column; gap:1.25rem; }
+.profile-form-wrap .card{ margin-bottom:0; }
+
+@media(max-width:768px){
+  .profile-layout{ grid-template-columns:1fr; }
+  .profile-info-card{ position:static; }
+}

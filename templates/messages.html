@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}Messages — MediBook{% endblock %}
+{% block content %}
+
+<div class="msg-page-header">
+  <h1 class="page-title"><i class="fa fa-comments"></i> Messages</h1>
+</div>
+
+<div class="msg-layout">
+  <!-- قائمة جهات الاتصال -->
+  <div class="contacts-panel">
+    <h3><i class="fa fa-users"></i> Contacts</h3>
+    {% if contacts %}
+      {% for c in contacts %}
+      <a href="{{ url_for('messages') }}?with={{ c.id }}"
+         class="contact-item {% if active_contact and active_contact.id == c.id %}active{% endif %}">
+        <div class="c-avatar">{{ c.name[0]|upper }}</div>
+        <div>
+          <div class="c-name">{{ c.name }}</div>
+          <div class="c-role">{{ c.role }}{% if c.specialty %} — {{ c.specialty }}{% endif %}</div>
+        </div>
+        {% if c.has_unread %}<span class="unread-dot"></span>{% endif %}
+      </a>
+      {% endfor %}
+    {% else %}
+      <div class="no-contacts">
+        <i class="fa fa-comment-slash"></i>
+        No contacts yet.
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- نافذة المحادثة -->
+  <div class="chat-panel">
+    {% if active_contact %}
+    <div class="chat-header">
+      <div class="c-avatar">{{ active_contact.name[0]|upper }}</div>
+      <div>
+        <div class="chat-contact-name">{{ active_contact.name }}</div>
+        <div class="chat-contact-sub">{{ active_contact.role }}{% if active_contact.specialty %} — {{ active_contact.specialty }}{% endif %}</div>
+      </div>
+    </div>
+    <div class="chat-body">
+      {% for msg in thread %}
+        {% if msg.sender_id == user.id %}
+        <div class="bubble-wrap-out">
+          <div>
+            <div class="bubble bubble-out">{{ msg.content }}</div>
+            <div class="bubble-meta bubble-meta-out">{{ msg.created_at.strftime('%H:%M') }}</div>
+          </div>
+        </div>
+        {% else %}
+        <div class="bubble-wrap-in">
+          <div>
+            <div class="bubble bubble-in">{{ msg.content }}</div>
+            <div class="bubble-meta">{{ msg.created_at.strftime('%H:%M') }}</div>
+          </div>
+        </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    <div class="chat-footer">
+      <form method="POST" action="{{ url_for('send_message') }}" class="form-inline">
+        <input type="hidden" name="receiver_id" value="{{ active_contact.id }}">
+        <textarea name="content" rows="2" placeholder="Type a message..." required></textarea>
+        <button class="btn btn-primary"><i class="fa fa-paper-plane"></i></button>
+      </form>
+    </div>
+    {% else %}
+    <div class="no-chat">
+      <i class="fa fa-comments"></i>
+      Select a contact to start chatting
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Register — MediBook{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="card">
+    <div class="card-title"><i class="fa fa-user-plus"></i> Create Patient Account</div>
+
+    {% if msg %}<div class="alert alert-danger">{{ msg }}</div>{% endif %}
+
+    <form action="{{ url_for('register') }}" method="post">
+      <div class="form-group">
+        <label class="form-label">First Name</label>
+        <input class="form-control" type="text" name="first_name" placeholder="Enter First Name" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Last Name</label>
+        <input class="form-control" type="text" name="last_name" placeholder="Enter Last Name" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-control" type="email" name="email" placeholder="Enter Email" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone</label>
+        <input class="form-control" type="text" name="phone" placeholder="Enter Phone">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-control" type="password" name="password" placeholder="Enter Password" required>
+      </div>
+      <button class="btn btn-primary btn-full" type="submit">
+        <i class="fa fa-user-plus"></i> Register as Patient
+      </button>
+    </form>
+
+    <p class="auth-link">Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+  </div>
+</div>
+{% endblock %}

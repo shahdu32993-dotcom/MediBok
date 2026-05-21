@@ -1,0 +1,5 @@
+/* admin.css — shared for admin pages */
+.filter-bar { display:flex; gap:.5rem; margin-bottom:1.25rem; flex-wrap:wrap; }
+.tbl-wrap { overflow-x:auto; }
+.user-status-active  { color:var(--ok);     font-weight:600; font-size:.85rem; }
+.user-status-disabled{ color:var(--danger); font-weight:600; font-size:.85rem; }

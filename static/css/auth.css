@@ -1,0 +1,4 @@
+/* auth.css — login & register */
+.auth-wrap { max-width:440px; margin:3rem auto; }
+.auth-demo { margin-top:1.25rem; padding:.9rem; background:var(--light); border-radius:10px; font-size:.78rem; color:var(--gray); line-height:1.8; }
+.auth-demo strong { color:var(--navy); }

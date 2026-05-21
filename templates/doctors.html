@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Doctors — MediBook{% endblock %}
+{% block content %}
+<h2 class="section-title">
+  <i class="fa fa-user-doctor"></i> Our Specialist Doctors
+</h2>
+<div class="doc-grid-page">
+  {% for doc in doctors %}
+  <div class="doc-card-page">
+    <div class="doc-avatar-lg">
+      <i class="fa fa-user-doctor"></i>
+    </div>
+    <div class="doc-name">{{ doc.name }}</div>
+    {% if doc.specialty %}
+    <div class="doc-detail"><i class="fa fa-stethoscope"></i> {{ doc.specialty }}</div>
+    {% endif %}
+    <div class="doc-detail"><i class="fa fa-phone"></i> {{ doc.phone or 'N/A' }}</div>
+    <div class="doc-detail"><i class="fa fa-envelope"></i> {{ doc.email }}</div>
+    <a href="{{ url_for('book_appointment') }}" class="btn btn-primary btn-sm mt-1">
+      <i class="fa fa-calendar-plus"></i> Book
+    </a>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

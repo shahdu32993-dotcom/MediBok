@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}MediBook — Your Health, Our Priority{% endblock %}
+{% block content %}
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Your Health is Our <em>Priority</em></h1>
+  <p>Book appointments with top specialists quickly and easily. Quality healthcare at your fingertips.</p>
+  <div class="hero-btns">
+    {% if session.user_id %}
+      <a href="{{ url_for('book_appointment') }}" class="btn-hero btn-hero-solid"><i class="fa fa-calendar-plus"></i> Book Appointment</a>
+      <a href="{{ url_for('dashboard') }}" class="btn-hero btn-hero-outline"><i class="fa fa-gauge"></i> My Dashboard</a>
+    {% else %}
+      <a href="{{ url_for('register') }}" class="btn-hero btn-hero-solid"><i class="fa fa-user-plus"></i> Get Started</a>
+      <a href="{{ url_for('login') }}" class="btn-hero btn-hero-outline"><i class="fa fa-right-to-bracket"></i> Sign In</a>
+    {% endif %}
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-row">
+  <div class="stat-box">
+    <div class="val">{{ departments|length }}</div>
+    <div class="lbl"><i class="fa fa-building-columns"></i> Departments</div>
+  </div>
+  <div class="stat-box">
+    <div class="val">{{ doctors|length }}</div>
+    <div class="lbl"><i class="fa fa-user-doctor"></i> Specialist Doctors</div>
+  </div>
+  <div class="stat-box">
+    <div class="val">24/7</div>
+    <div class="lbl"><i class="fa fa-clock"></i> Online Booking</div>
+  </div>
+</div>
+
+<!-- DEPARTMENTS -->
+<h2 class="section-title"><i class="fa fa-building-columns"></i> Our Departments</h2>
+<div class="dept-grid">
+  {% set icons = ['fa-heart-pulse','fa-brain','fa-bone','fa-baby','fa-hand-dots'] %}
+  {% for dept in departments %}
+  <div class="dept-card">
+    <i class="fa {{ icons[loop.index0 % icons|length] }}"></i>
+    <h3>{{ dept.name }}</h3>
+    <p>{{ dept.description }}</p>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- DOCTORS -->
+<h2 class="section-title"><i class="fa fa-user-doctor"></i> Our Specialists</h2>
+<div class="doc-grid">
+  {% for doc in doctors %}
+  <div class="doc-card">
+    <div class="doc-avatar"><i class="fa fa-user-doctor"></i></div>
+    <strong>{{ doc.name }}</strong>
+    {% if doc.specialty %}<p class="td-teal" >{{ doc.specialty }}</p>{% endif %}
+    <p class="td-sub" >{{ doc.phone or '' }}</p>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
