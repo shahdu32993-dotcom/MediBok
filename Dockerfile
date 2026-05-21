@@ -9,8 +9,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy project files
 COPY . .
 
-# Create instance folder for SQLite DB
-RUN mkdir -p /app/instance
+# Create instance folder for MySQL DB
 
 EXPOSE 5000
 
