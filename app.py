@@ -16,11 +16,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-
-# ─────────────────────────────────────────
-#  MODELS
-# ─────────────────────────────────────────
-
 class Department(db.Model):
     id          = db.Column(db.Integer, primary_key=True)
     name        = db.Column(db.String(100), nullable=False, unique=True)
@@ -28,7 +23,6 @@ class Department(db.Model):
 
     def __repr__(self):
         return f"<Department {self.name}>"
-
 
 class User(db.Model):
     id            = db.Column(db.Integer, primary_key=True)
@@ -58,7 +52,6 @@ class User(db.Model):
     def __repr__(self):
         return f"<User {self.email}>"
 
-
 class Appointment(db.Model):
     id            = db.Column(db.Integer, primary_key=True)
     patient_id    = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -76,7 +69,6 @@ class Appointment(db.Model):
     def __repr__(self):
         return f"<Appointment {self.id} - {self.status}>"
 
-
 class Message(db.Model):
     id          = db.Column(db.Integer, primary_key=True)
     sender_id   = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -88,11 +80,6 @@ class Message(db.Model):
     def __repr__(self):
         return f"<Message {self.sender_id} → {self.receiver_id}>"
 
-
-# ─────────────────────────────────────────
-#  HELPERS
-# ─────────────────────────────────────────
-
 def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -102,15 +89,13 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated
 
-
 def get_current_user():
     if 'user_id' in session:
         return db.session.get(User, session['user_id'])
     return None
 
-
 def seed_initial_data():
-    """تهيئة الأقسام وحساب Admin عند أول تشغيل فقط."""
+
     if Department.query.first():
         return
 
@@ -148,11 +133,6 @@ def seed_initial_data():
 
     db.session.commit()
 
-
-# ─────────────────────────────────────────
-#  ROUTES
-# ─────────────────────────────────────────
-
 @app.route('/')
 def index():
     db.session.execute(text('CREATE DATABASE IF NOT EXISTS hospital_db'))
@@ -164,7 +144,6 @@ def index():
     departments = Department.query.all()
     doctors     = User.query.filter_by(role='doctor').all()
     return render_template('index.html', user=user, departments=departments, doctors=doctors)
-
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -191,7 +170,6 @@ def register():
 
     return render_template('register.html')
 
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -200,25 +178,23 @@ def login():
         user  = User.query.filter_by(email=email).first()
 
         if user and user.is_active and user.check_password(pwd):
-            session.clear()                      # امسح أي session قديم أولاً
+            session.clear()
             session['user_id']  = user.id
             session['role']     = user.role
             session['username'] = user.name
             flash(f"Welcome back, {user.name}!", 'success')
-            return redirect(url_for('dashboard'))  # redirect صح بدل render
+            return redirect(url_for('dashboard'))
 
         msg = 'Invalid email or password.'
         return render_template('login.html', msg=msg)
 
     return render_template('login.html')
 
-
 @app.route('/logout')
 def logout():
     session.clear()
     flash('Logged out successfully.', 'info')
     return redirect(url_for('index'))
-
 
 @app.route('/dashboard')
 @login_required
@@ -251,7 +227,6 @@ def dashboard():
                                total_appointments=total_appointments, today_count=today_count,
                                recent_users=recent_users)
 
-
 @app.route('/book', methods=['GET', 'POST'])
 @login_required
 def book_appointment():
@@ -277,7 +252,6 @@ def book_appointment():
     return render_template('book.html', user=user, departments=departments,
                            doctors=doctors, today=today)
 
-
 @app.route('/appointment/<int:appt_id>/update', methods=['POST'])
 @login_required
 def update_appointment(appt_id):
@@ -290,7 +264,6 @@ def update_appointment(appt_id):
         flash('Appointment updated.', 'success')
     return redirect(url_for('dashboard'))
 
-
 @app.route('/appointment/<int:appt_id>/cancel', methods=['POST'])
 @login_required
 def cancel_appointment(appt_id):
@@ -302,20 +275,17 @@ def cancel_appointment(appt_id):
         flash('Appointment cancelled.', 'info')
     return redirect(url_for('dashboard'))
 
-
 @app.route('/departments')
 def departments():
     user  = get_current_user()
     depts = Department.query.all()
     return render_template('departments.html', user=user, departments=depts)
 
-
 @app.route('/doctors')
 def doctors():
     user    = get_current_user()
     doctors = User.query.filter_by(role='doctor').all()
     return render_template('doctors.html', user=user, doctors=doctors)
-
 
 @app.route('/messages')
 @login_required
@@ -338,7 +308,7 @@ def messages():
                 sender_id=cid, receiver_id=user.id, is_read=False).count() > 0
             contacts.append(c)
 
-    with_id  = request.args.get('with', type=int)
+    with_id        = request.args.get('with', type=int)
     active_contact = None
     thread         = []
     if with_id:
@@ -356,7 +326,6 @@ def messages():
     return render_template('messages.html', user=user, contacts=contacts,
                            active_contact=active_contact, thread=thread)
 
-
 @app.route('/messages/send', methods=['POST'])
 @login_required
 def send_message():
@@ -368,7 +337,6 @@ def send_message():
         db.session.commit()
     return redirect(url_for('messages', **{'with': receiver_id}))
 
-
 @app.route('/my-patients')
 @login_required
 def my_patients():
@@ -379,7 +347,6 @@ def my_patients():
     patient_ids = {a.patient_id for a in appts}
     patients    = [db.session.get(User, pid) for pid in patient_ids if db.session.get(User, pid)]
     return render_template('my_patients.html', user=user, patients=patients, appointments=appts)
-
 
 @app.route('/profile', methods=['GET', 'POST'])
 @login_required
@@ -400,7 +367,6 @@ def profile():
         return redirect(url_for('profile'))
     return render_template('profile.html', user=user)
 
-
 @app.route('/admin/users')
 @login_required
 def admin_users():
@@ -413,7 +379,6 @@ def admin_users():
         query = query.filter_by(role=role)
     users = query.order_by(User.created_at.desc()).all()
     return render_template('admin_users.html', user=user, users=users, selected_role=role)
-
 
 @app.route('/admin/add-doctor', methods=['GET', 'POST'])
 @login_required
@@ -443,7 +408,6 @@ def admin_add_doctor():
         return redirect(url_for('admin_users'))
     return render_template('admin_add_doctor.html', user=user, departments=departments)
 
-
 @app.route('/admin/user/<int:uid>/toggle', methods=['POST'])
 @login_required
 def admin_toggle_user(uid):
@@ -456,7 +420,6 @@ def admin_toggle_user(uid):
         db.session.commit()
         flash(f'User {"enabled" if target.is_active else "disabled"}.', 'success')
     return redirect(url_for('admin_users'))
-
 
 @app.route('/admin/appointments')
 @login_required
@@ -471,7 +434,6 @@ def admin_appointments():
     appointments = query.order_by(Appointment.date.desc()).all()
     return render_template('admin_appointments.html', user=user,
                            appointments=appointments, selected_status=status)
-
 
 if __name__ == "__main__":
     with app.app_context():
